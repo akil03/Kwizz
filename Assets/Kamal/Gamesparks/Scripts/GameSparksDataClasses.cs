@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class GSFBLoginResult
@@ -11,9 +12,27 @@ public class GSFBLoginResult
 }
 
 [Serializable]
-public class ScriptData
+public class Error
 {
-    public string data;
+    public string Status;
+}
+
+[Serializable]
+public class GSError
+{
+    public Error error;
+}
+
+[Serializable]
+public class Result
+{
+    public string result;
+}
+
+[Serializable]
+public class GSResult
+{
+    public Result scriptData;
 }
 
 [Serializable]
@@ -23,20 +42,13 @@ public class UserData
 }
 
 [Serializable]
-public class QuestionContainer
+public class ResultList
 {
-    public string date;
-    public string data;
+    public List<string> result;
 }
 
 [Serializable]
-public class QuestionScriptData
+public class GSListResult
 {
-    public string question;
-}
-
-[Serializable]
-public class QuestionResult
-{
-    public QuestionScriptData scriptData;
+    public ResultList scriptData;
 }

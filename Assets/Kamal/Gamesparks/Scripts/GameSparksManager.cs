@@ -10,7 +10,9 @@ public class GameSparksManager : MonoBehaviour
     public string Name, Pwd;
     public static StringDelegate FBConnectSuccess;
     public static StringDelegate NewUser;
+    public static ParameterlessDelegate authenticated;
     public static GameSparksManager instance;
+    bool isloggedIn;
 
     private void Awake()
     {
@@ -23,6 +25,17 @@ public class GameSparksManager : MonoBehaviour
     private void Start()
     {
         FacebookManager.LoginSuccess += FBLogin;
+        GS.GameSparksAuthenticated += delegate (string str)
+        {
+            if (!isloggedIn)
+            {
+                isloggedIn = true;
+                if (authenticated != null)
+                {
+                    authenticated();
+                }
+            }
+        };
         if (autoLogin)
         {
             Login(Name, Pwd);
@@ -87,6 +100,7 @@ public class GameSparksManager : MonoBehaviour
 
     public void LogOut()
     {
+        isloggedIn = false;
         GS.Reset();
     }
 }

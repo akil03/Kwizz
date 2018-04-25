@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameSparkRequests
 {
-    public void Request(string eventKey, string attributeKey, string attributeValue, StringDelegate strDelegate = null)
+    public void Request(string eventKey, string attributeKey, string attributeValue, StringDelegate SuccessCallback = null, StringDelegate FailedCallback = null)
     {
         new LogEventRequest()
             .SetEventKey(eventKey)
@@ -14,13 +14,19 @@ public class GameSparkRequests
             if (response.HasErrors)
             {
                 Debug.Log(eventKey + " request failed!");
+                if (FailedCallback != null)
+                {
+                    FailedCallback(response.JSONString);
+                }
             }
             else
             {
 
             }
-            if (strDelegate != null)
-                strDelegate(response.JSONString);
+            if (SuccessCallback != null)
+            {
+                SuccessCallback(response.JSONString);
+            }
         });
     }
 
@@ -50,12 +56,15 @@ public class GameSparkRequests
             }
             else
             {
-                SuccessCallback(response.JSONString);
+                if (SuccessCallback != null)
+                {
+                    SuccessCallback(response.JSONString);
+                }
             }
         });
     }
 
-    public void Request(string eventKey, StringDelegate strDelegate = null)
+    public void Request(string eventKey, StringDelegate SuccessCallback = null, StringDelegate FailedCallback = null)
     {
         new LogEventRequest()
             .SetEventKey(eventKey)
@@ -64,13 +73,19 @@ public class GameSparkRequests
                 if (response.HasErrors)
                 {
                     Debug.Log(eventKey + " Request failed!");
+                    if (FailedCallback != null)
+                    {
+                        FailedCallback(response.JSONString);
+                    }
                 }
                 else
                 {
                     Debug.Log("Request success!");
                 }
-                if (strDelegate != null)
-                    strDelegate(response.JSONString);
+                if (SuccessCallback != null)
+                {
+                    SuccessCallback(response.JSONString);
+                }
             });
     }
 }

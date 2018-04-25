@@ -19840,7 +19840,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1641681120}
-        m_MethodName: GetAQuestion
+        m_MethodName: GetQuestions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -13,7 +13,7 @@ public class QuestionsManager : MonoBehaviour
     public List<QuestionElement> questionElementInstances;
     public QuestionElement[] questionPrefabs;
     public Transform questionsContainer;
-    public Questions questions;
+    public List<Question> questions;
 
     private void Awake()
     {
@@ -49,21 +49,19 @@ public class QuestionsManager : MonoBehaviour
     private void GetQuestions()
     {
         GameSparkRequests requests = new GameSparkRequests();
-        requests.Request("GetQuestion", "date", date.text, GotQuestionsCallback);
+        requests.Request("GetAllQuestions", "date", date.text, GotQuestionsCallback);
     }
 
     private void GotQuestionsCallback(string str)
     {
         ResetQuestions();
-        string json = JsonUtility.FromJson<QuestionResult>(str).scriptData.question;
-        if (json != null)
+        GSListResult result = JsonUtility.FromJson<GSListResult>(str);
+        foreach (var item in result.scriptData.result)
         {
-            questions = JsonUtility.FromJson<Questions>(json);
-            foreach (var item in questions.questionList)
-            {
-                QuestionElement instance = CreateQuestion((int)item.type);
-                instance.Setup(item);
-            }
+            Question qn = JsonUtility.FromJson<Question>(item);
+            QuestionElement instance = CreateQuestion((int)qn.type);
+            instance.Setup(qn);
+            questions.Add(qn);
         }
     }
 
@@ -88,13 +86,18 @@ public class QuestionsManager : MonoBehaviour
 
     public void SaveQuestions()
     {
-        questions.questionList = questionElementInstances.Select(a => a.Question).ToList();
-        string json = JsonUtility.ToJson(questions);
-        GameSparkRequests requests = new GameSparkRequests();
-        Dictionary<string, object> dictionary = new Dictionary<string, object>();
-        dictionary.Add("date", date.text);
-        dictionary.Add("data", json);
-        requests.Request("SaveQuestion", dictionary, SaveQuestionsSuccess);
+        questions = questionElementInstances.Select(a => a.Question).ToList();
+        foreach (var item in questions)
+        {
+            string json = JsonUtility.ToJson(item);
+            GameSparkRequests requests = new GameSparkRequests();
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("code", item.code);
+            dictionary.Add("data", json);
+            dictionary.Add("answer", item.correctIndex);
+            dictionary.Add("date", date.text);
+            requests.Request("SaveQuestion", dictionary, SaveQuestionsSuccess);
+        }
     }
 
     private void SaveQuestionsSuccess(string str)
@@ -109,6 +112,6 @@ public class QuestionsManager : MonoBehaviour
             Destroy(item.gameObject);
         }
         questionElementInstances.Clear();
-        questions = new Questions();
+        questions.Clear();
     }
 }

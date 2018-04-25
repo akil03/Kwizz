@@ -2,12 +2,6 @@
 using System.Collections.Generic;
 
 [Serializable]
-public class Questions
-{
-    public List<Question> questionList;
-}
-
-[Serializable]
 public class Question
 {
     public QuestionType type;

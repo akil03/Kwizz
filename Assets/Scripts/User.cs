@@ -1,15 +1,10 @@
-﻿using System;
-using System.Linq;
-using GameSparks.Core;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class User : MonoBehaviour
 {
     public InputField userName, pwd, phoneNumber, code;
     public GameObject loginPage, savePhoneNumberPage, appStartPage, enterCodePage, questionPage;
-    string id;
-    public Questions questions;
     public QuestionsPage questionsPage;
     public static User instance;
     public bool isLoser;
@@ -23,40 +18,19 @@ public class User : MonoBehaviour
 
     private void Start()
     {
-        GS.GameSparksAuthenticated += OnGameSparksLogin;
+        GameSparksManager.authenticated += OnGameSparksLogin;
     }
 
-    private void OnGameSparksLogin(string obj)
+    private void OnGameSparksLogin()
     {
-        id = obj;
         loginPage.SetActive(false);
         CheckPhoneNumber();
-        GetQuestions();
-        CheckIsLoser();
-    }
-
-    private void CheckIsLoser()
-    {
-        GameSparkRequests request = new GameSparkRequests();
-        request.Request("IsLoser", IsLoserCallback);
     }
 
     private void CheckPhoneNumber()
     {
         GameSparkRequests request = new GameSparkRequests();
         request.Request("GetUserData", GetUserDataCallback);
-    }
-
-    private void IsLoserCallback(string str)
-    {
-        if (str.Contains("true"))
-        {
-            isLoser = true;
-        }
-        else
-        {
-            print("proceed man!");
-        }
     }
 
     public void OpenGame()
@@ -74,6 +48,7 @@ public class User : MonoBehaviour
 
     private void GetUserDataCallback(string str)
     {
+        print(str);
         if (!str.Contains("Error"))
         {
             appStartPage.SetActive(true);
@@ -110,35 +85,28 @@ public class User : MonoBehaviour
         }
     }
 
-    private void GetQuestions()
+    public void GetQuestions()
     {
         GameSparkRequests requests = new GameSparkRequests();
-        requests.Request("GetQuestion", "date", DateTime.Today.ToString("dd/MM/yyyy"), GotQuestionsCallback);
+        requests.Request("GetQuestion", "code", code.text, GetQuestionsSuccessCallback, GetQuestionsFailedCallback);
     }
 
-    private void GotQuestionsCallback(string str)
+    private void GetQuestionsFailedCallback(string str)
     {
-        string json = JsonUtility.FromJson<QuestionResult>(str).scriptData.question;
-        if (json != null)
+        GSError result = JsonUtility.FromJson<GSError>(str);
+        if (result.error.Status == ErrorCodes.noteligible)
         {
-            questions = JsonUtility.FromJson<Questions>(json);
+            print("Not eligible to get this question!");
+        }
+        if (result.error.Status == ErrorCodes.close)
+        {
+            print("question is already closed!");
         }
     }
 
-    public void GetAQuestion()
+    private void GetQuestionsSuccessCallback(string str)
     {
-        try
-        {
-            var result = questions.questionList.First(a => a.code == code.text);
-            enterCodePage.SetActive(false);
-            questionPage.SetActive(true);
-            questionsPage.Setup(result);
-        }
-        catch (Exception)
-        {
-            print("wrong fucking code moron!");
-
-        }
+        print(str);
     }
 
     public void Logout()
