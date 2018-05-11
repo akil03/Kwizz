@@ -30,6 +30,12 @@ public class QuestionsManager : MonoBehaviour
         {
             date.onEndEdit.AddListener(DateChanged);
         }
+        EventManager.Instance.OnQuestionClose += CloseQuestion;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.Instance.OnQuestionClose -= CloseQuestion;
     }
 
     private void OnGameSparksLogin(string obj)
@@ -48,8 +54,7 @@ public class QuestionsManager : MonoBehaviour
 
     private void GetQuestions()
     {
-        GameSparkRequests requests = new GameSparkRequests();
-        requests.Request("GetAllQuestions", "date", date.text, GotQuestionsCallback);
+        new GameSparkRequests("GetAllQuestions").Add("date", date.text).Request(GotQuestionsCallback);
     }
 
     private void GotQuestionsCallback(string str)
@@ -75,6 +80,7 @@ public class QuestionsManager : MonoBehaviour
         QuestionElement instance = Instantiate(questionPrefabs[type]);
         instance.transform.SetParent(questionsContainer);
         questionElementInstances.Add(instance);
+        instance.GenerateCode();
         return instance;
     }
 
@@ -90,19 +96,13 @@ public class QuestionsManager : MonoBehaviour
         foreach (var item in questions)
         {
             string json = JsonUtility.ToJson(item);
-            GameSparkRequests requests = new GameSparkRequests();
-            Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add("code", item.code);
-            dictionary.Add("data", json);
-            dictionary.Add("answer", item.correctIndex);
-            dictionary.Add("date", date.text);
-            requests.Request("SaveQuestion", dictionary, SaveQuestionsSuccess);
+            new GameSparkRequests("SaveQuestion").Add("code", item.code).Add("data", json).Add("answer", item.correctIndex).Add("date", date.text).Request(SaveQuestionsSuccess);
         }
     }
 
     private void SaveQuestionsSuccess(string str)
     {
-        print("Save Success!");
+        Popup.Instance.DisplayMessage("Questions saved.");
     }
 
     public void ResetQuestions()
@@ -113,5 +113,23 @@ public class QuestionsManager : MonoBehaviour
         }
         questionElementInstances.Clear();
         questions.Clear();
+    }
+
+    public void CloseQuestion(Question question)
+    {
+        new GameSparkRequests("CloseQuestion").Add("code", question.code).Request(CloseClosedSuccessfully);
+    }
+
+    private void CloseClosedSuccessfully(string str)
+    {
+        GSResult result = JsonUtility.FromJson<GSResult>(str);
+        if (result.scriptData.result == "open")
+        {
+            Popup.Instance.DisplayMessage("Question opened.");
+        }
+        else if (result.scriptData.result == "closed")
+        {
+            Popup.Instance.DisplayMessage("Question closed.");
+        }
     }
 }

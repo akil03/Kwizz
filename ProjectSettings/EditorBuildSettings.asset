@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Kamal/Gamesparks/Scenes/gs test.unity
     guid: fdc48e081a4810143bc9a99141329c38
-  - enabled: 1
+  - enabled: 0
     path: Assets/UI/_scenes/main_2.unity
     guid: 753dc131230044e159c8621fbe37fc1c
+  - enabled: 1
+    path: Assets/UI/_scenes/main.unity
+    guid: c97ebde6314914ddc82ada2e1ed34343

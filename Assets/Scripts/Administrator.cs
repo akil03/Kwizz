@@ -15,7 +15,14 @@ public class Administrator : MonoBehaviour
         {
             instance = this;
         }
-        GS.Reset();
+        if (!Application.isEditor)
+        {
+            GS.Reset();
+        }
+        else
+        {
+            print("Not resetting login coz we are using editor.");
+        }
     }
 
     private void Start()
@@ -33,6 +40,6 @@ public class Administrator : MonoBehaviour
 
     public void Login()
     {
-        GameSparksManager.instance.Login(userName.text, pwd.text);
+        GameSparksManager.Instance.Login(userName.text, pwd.text);
     }
 }

@@ -13,7 +13,6 @@ public class QuestionElement : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Question.code = generator.GenerateCode();
         for (int i = 0; i < inputFields.Length; i++)
         {
             inputFields[i].onEndEdit.AddListener(OptionAdded);
@@ -28,6 +27,11 @@ public class QuestionElement : MonoBehaviour
     private void QuestionAdded(string arg0)
     {
         Question.question = arg0;
+    }
+
+    public void GenerateCode()
+    {
+        Question.code = generator.GenerateCode();
     }
 
     private void Toggled(bool arg0)

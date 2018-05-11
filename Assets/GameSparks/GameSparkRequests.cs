@@ -4,51 +4,32 @@ using UnityEngine;
 
 public class GameSparkRequests
 {
-    public void Request(string eventKey, string attributeKey, string attributeValue, StringDelegate SuccessCallback = null, StringDelegate FailedCallback = null)
-    {
-        new LogEventRequest()
-            .SetEventKey(eventKey)
-            .SetEventAttribute(attributeKey, attributeValue)
-        .Send((response) =>
-        {
-            if (response.HasErrors)
-            {
-                Debug.Log(eventKey + " request failed!");
-                if (FailedCallback != null)
-                {
-                    FailedCallback(response.JSONString);
-                }
-            }
-            else
-            {
+    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+    string eventKey;
 
-            }
-            if (SuccessCallback != null)
-            {
-                SuccessCallback(response.JSONString);
-            }
-        });
+    public GameSparkRequests(string eventKey)
+    {
+        this.eventKey = eventKey;
     }
 
-    public void Request(string eventKey, Dictionary<string, object> dictionary, StringDelegate SuccessCallback, StringDelegate FailedCallback = null)
+    public GameSparkRequests Add(string key, object value)
+    {
+        dictionary.Add(key, value);
+        return this;
+    }
+
+    public void Request(StringDelegate SuccessCallback = null, StringDelegate FailedCallback = null)
     {
         var req = new LogEventRequest();
-        req.SetEventKey(eventKey);
         foreach (var item in dictionary)
         {
-            if (item.Value != null)
-            {
-                req.SetEventAttribute(item.Key, item.Value.ToString());
-            }
-            else
-            {
-                Debug.Log(item.Key + " has null value!");
-            }
+            req.SetEventAttribute(item.Key, item.Value.ToString());
         }
-        req.Send((response) =>
+        req.SetEventKey(eventKey).Send((response) =>
         {
             if (response.HasErrors)
             {
+                Debug.Log(eventKey + " request failed!\n" + response.Errors.JSON);
                 if (FailedCallback != null)
                 {
                     FailedCallback(response.JSONString);
@@ -56,36 +37,12 @@ public class GameSparkRequests
             }
             else
             {
+                Debug.Log(eventKey + " request success!\n" + response.JSONString);
                 if (SuccessCallback != null)
                 {
                     SuccessCallback(response.JSONString);
                 }
             }
         });
-    }
-
-    public void Request(string eventKey, StringDelegate SuccessCallback = null, StringDelegate FailedCallback = null)
-    {
-        new LogEventRequest()
-            .SetEventKey(eventKey)
-            .Send((response) =>
-            {
-                if (response.HasErrors)
-                {
-                    Debug.Log(eventKey + " Request failed!");
-                    if (FailedCallback != null)
-                    {
-                        FailedCallback(response.JSONString);
-                    }
-                }
-                else
-                {
-                    Debug.Log("Request success!");
-                }
-                if (SuccessCallback != null)
-                {
-                    SuccessCallback(response.JSONString);
-                }
-            });
     }
 }

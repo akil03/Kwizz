@@ -1,18 +1,17 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 
-public class EventManager : MonoBehaviour
+public class EventManager : Singleton<EventManager>
 {
-    public static EventManager instance;
     public bool debugLog;
+    public event QuestionDelegate OnQuestionClose;
 
-    private void Awake()
+    public void CloseQuestion(Question question)
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
+        OnQuestionClose(question);
     }
 }
 
+public delegate void QuestionDelegate(Question question);
 public delegate void StringDelegate(string str);
 public delegate void ParameterlessDelegate();
+public delegate void LeaderboardDataDelegate(List<Datum> list);
