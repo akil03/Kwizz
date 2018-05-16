@@ -29,6 +29,7 @@ public class SignupPage : MonoBehaviour
     private void OnRegistrationSuccess(string str)
     {
         saveNumber = true;
+        User.instance.dontCheckPhoneNumber = true;
         GameSparksManager.Instance.Login(email.text, password.text);
     }
 

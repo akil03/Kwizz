@@ -25,6 +25,7 @@ public class GameSparksManager : Singleton<GameSparksManager>
     {
         FacebookManager.LoginSuccess += FBLogin;
         GameSparks.Api.Messages.NewHighScoreMessage.Listener += newHg;
+        GoogleManager.Instance.loginSuccess += GoogleLogin;
         GS.GameSparksAuthenticated += delegate (string str)
         {
             if (!isloggedIn)
@@ -48,6 +49,36 @@ public class GameSparksManager : Singleton<GameSparksManager>
         print("New score");
     }
 
+
+    void GoogleLogin()
+    {
+        new AuthenticationRequest().SetUserName(LCGoogleLoginBridge.GSIEmail()).SetPassword(LCGoogleLoginBridge.GSIEmail()).Send(callback =>
+        {
+            if (!callback.HasErrors)
+            {
+                if (debugLog)
+                {
+                    print("Login Success!");
+                }
+            }
+            else
+            {
+                new RegistrationRequest().SetDisplayName(LCGoogleLoginBridge.GSIUserName()).SetUserName(LCGoogleLoginBridge.GSIEmail()).SetPassword(LCGoogleLoginBridge.GSIEmail()).Send(response =>
+                {
+                    if (!response.HasErrors)
+                    {
+                        isloggedIn = false;
+                        Login(LCGoogleLoginBridge.GSIEmail(), LCGoogleLoginBridge.GSIEmail());
+                    }
+                    else
+                    {
+                        print(response.Errors.JSON);
+                    }
+                });
+            }
+        });
+    }
+
     public void Register(string displayName, string userName, string password)
     {
         new RegistrationRequest().SetDisplayName(displayName).SetUserName(userName).SetPassword(password).Send(response =>
@@ -55,7 +86,10 @@ public class GameSparksManager : Singleton<GameSparksManager>
             if (!response.HasErrors)
             {
                 isloggedIn = false;
-                RegistrationSuccess(response.JSONString);
+                if (RegistrationSuccess != null)
+                {
+                    RegistrationSuccess(response.JSONString);
+                }
             }
             else
             {
@@ -84,42 +118,27 @@ public class GameSparksManager : Singleton<GameSparksManager>
 
     private void FBLogin()
     {
-        new DeviceAuthenticationRequest().Send(response =>
+        new AuthenticationRequest().SetUserName(AccessToken.CurrentAccessToken.UserId).SetPassword(AccessToken.CurrentAccessToken.UserId).Send(callback =>
         {
-            if (!response.HasErrors)
+            if (!callback.HasErrors)
             {
-                new FacebookConnectRequest().SetAccessToken(AccessToken.CurrentAccessToken.TokenString).SetErrorOnSwitch(true).SetDoNotLinkToCurrentPlayer(true).Send(callback =>
+                if (debugLog)
                 {
-                    if (!callback.HasErrors)
+                    print("Login Success!");
+                }
+            }
+            else
+            {
+                new RegistrationRequest().SetDisplayName(FacebookManager.instance.userDetails.name).SetUserName(AccessToken.CurrentAccessToken.UserId).SetPassword(AccessToken.CurrentAccessToken.UserId).Send(response =>
+                {
+                    if (!response.HasErrors)
                     {
-                        if (debugLog)
-                        {
-                            print("FB login success.");
-                            print(callback.JSONString);
-                        }
-                        GSFBLoginResult fbLoginResult = JsonUtility.FromJson<GSFBLoginResult>(callback.JSONString);
-                        if (fbLoginResult.newPlayer)
-                        {
-                            if (debugLog)
-                            {
-                                print("New user event is fired!");
-                            }
-                            if (NewUser != null)
-                            {
-                                foreach (var item in callback.ScriptData.BaseData)
-                                {
-                                    NewUser(((GSData)item.Value).JSON);
-                                }
-                            }
-                        }
-                        if (FBConnectSuccess != null)
-                        {
-                            FBConnectSuccess(callback.JSONString);
-                        }
+                        isloggedIn = false;
+                        Login(AccessToken.CurrentAccessToken.UserId, AccessToken.CurrentAccessToken.UserId);
                     }
                     else
                     {
-                        print(callback.Errors.JSON);
+                        print(response.Errors.JSON);
                     }
                 });
             }

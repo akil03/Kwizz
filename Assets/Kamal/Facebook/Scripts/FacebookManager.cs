@@ -13,6 +13,7 @@ public class FacebookManager : MonoBehaviour
     public static StringDelegate GotUserDetails;
     public static StringDelegate GotFriends;
     public static FacebookManager instance;
+    public FacebookUserDetailsResult userDetails;
 
     private void Awake()
     {
@@ -45,14 +46,7 @@ public class FacebookManager : MonoBehaviour
 
     public void Login()
     {
-        if (!FB.IsLoggedIn)
-        {
-            FB.LogInWithPublishPermissions(permissionsQuery, LoginCallback);
-        }
-        else
-        {
-            LoginSuccess();
-        }
+        FB.LogInWithPublishPermissions(permissionsQuery, LoginCallback);
     }
 
     private void LoginCallback(ILoginResult result)
@@ -62,10 +56,6 @@ public class FacebookManager : MonoBehaviour
             if (debugLog)
             {
                 print("FB Login success event fired!");
-            }
-            if (LoginSuccess != null)
-            {
-                LoginSuccess();
             }
             FB.API(detailsQuery, HttpMethod.GET, GotUserDetailsCallback);
             FB.API(friendsQuery, HttpMethod.GET, GotFriendsCallback);
@@ -84,9 +74,14 @@ public class FacebookManager : MonoBehaviour
             {
                 print("Got user details event fired!");
             }
+            userDetails = JsonUtility.FromJson<FacebookUserDetailsResult>(result.RawResult);
             if (GotUserDetails != null)
             {
                 GotUserDetails(result.RawResult);
+            }
+            if (LoginSuccess != null)
+            {
+                LoginSuccess();
             }
         }
         else

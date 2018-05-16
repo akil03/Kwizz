@@ -10,7 +10,8 @@ public class User : MonoBehaviour
     public GameObject loginPage, savePhoneNumberPage, appStartPage, enterCodePage, questionPage;
     public QuestionsPage questionsPage;
     public static User instance;
-    bool dontCheckPhoneNumber;
+    public bool dontCheckPhoneNumber;
+
 
     private void Awake()
     {
@@ -30,19 +31,12 @@ public class User : MonoBehaviour
     {
         GameSparksManager.Instance.authenticated += OnGameSparksLogin;
         GameSparksManager.Instance.loggedOut += OnLogout;
-        GameSparksManager.Instance.RegistrationSuccess += OnRegistrationSuccess;
-    }
-
-    private void OnRegistrationSuccess(string str)
-    {
-        dontCheckPhoneNumber = true;
     }
 
     private void OnDisable()
     {
         GameSparksManager.Instance.authenticated -= OnGameSparksLogin;
         GameSparksManager.Instance.loggedOut -= OnLogout;
-        GameSparksManager.Instance.RegistrationSuccess -= OnRegistrationSuccess;
     }
 
     private void OnGameSparksLogin()
