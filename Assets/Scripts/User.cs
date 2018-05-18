@@ -135,6 +135,11 @@ public class User : MonoBehaviour
 
     private void GetQuestionsSuccessCallback(string str)
     {
+        if (str.Contains("winner"))
+        {
+            Popup.Instance.DisplayMessage("You won the game today.");
+            return;
+        }
         enterCodePage.SetActive(false);
         questionPage.SetActive(true);
         questionsPage.Setup(JsonUtility.FromJson<Question>(JsonUtility.FromJson<GSResult>(str).scriptData.result));

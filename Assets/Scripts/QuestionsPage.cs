@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class QuestionsPage : MonoBehaviour
 {
     Question current;
+    public int time;
     public Text question;
     public Text[] options;
     public Toggle[] toggleGroup;
@@ -16,7 +17,7 @@ public class QuestionsPage : MonoBehaviour
     public void Setup(Question question)
     {
         current = question;
-        timer.text = "10";
+        timer.text = time.ToString();
         this.question.text = question.question;
         for (int i = 0; i < options.Length; i++)
         {
@@ -27,7 +28,7 @@ public class QuestionsPage : MonoBehaviour
 
     IEnumerator StartTimer()
     {
-        int i = 10;
+        int i = time;
         while (i > 0)
         {
             yield return new WaitForSeconds(1);

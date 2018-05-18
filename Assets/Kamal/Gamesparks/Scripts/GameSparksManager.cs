@@ -8,8 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(GameSparksUnity))]
 public class GameSparksManager : Singleton<GameSparksManager>
 {
-    public bool debugLog, autoLogin;
-    public string Name, Pwd;
+    public bool debugLog;
     public StringDelegate FBConnectSuccess;
     public StringDelegate NewUser;
     public StringDelegate RegistrationSuccess;
@@ -20,6 +19,7 @@ public class GameSparksManager : Singleton<GameSparksManager>
     public LeaderboardDataDelegate gotLeaderboard;
     public LeaderboardDataDelegate gotPlayerInLeaderoard;
     bool isloggedIn;
+    public GameObject loginPage, loading;
 
     private void Start()
     {
@@ -31,6 +31,7 @@ public class GameSparksManager : Singleton<GameSparksManager>
             if (!isloggedIn)
             {
                 isloggedIn = true;
+                loading.SetActive(false);
                 if (authenticated != null)
                 {
                     authenticated();
@@ -38,9 +39,22 @@ public class GameSparksManager : Singleton<GameSparksManager>
                 }
             }
         };
-        if (autoLogin)
+        StartCoroutine(WaitForLogin());
+    }
+
+    System.Collections.IEnumerator WaitForLogin()
+    {
+        int i = 0;
+        while (!GS.Authenticated && i < 3)
         {
-            Login(Name, Pwd);
+            yield return new WaitForSeconds(1);
+            i++;
+        }
+        if (!GS.Authenticated)
+        {
+            GS.Reset();
+            loginPage.SetActive(true);
+            loading.SetActive(false);
         }
     }
 
