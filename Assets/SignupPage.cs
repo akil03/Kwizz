@@ -31,10 +31,30 @@ public class SignupPage : MonoBehaviour
         saveNumber = true;
         User.instance.dontCheckPhoneNumber = true;
         GameSparksManager.Instance.Login(email.text, password.text);
+        gameObject.SetActive(false);
     }
 
     public void Register()
     {
+        try
+        {
+            long.Parse(phoneNumber.text);
+            if (phoneNumber.text.Length < 10 || phoneNumber.text.Length > 12)
+            {
+                Popup.Instance.DisplayMessage("Please enter a valid phone number!");
+                return;
+            }
+        }
+        catch
+        {
+            Popup.Instance.DisplayMessage("Please enter a valid phone number!");
+            return;
+        }
+        if (!email.text.Contains("@") || !email.text.Contains(".com"))
+        {
+            Popup.Instance.DisplayMessage("Please enter a valid email address!");
+            return;
+        }
         if (password.text != confirmPassowrd.text)
         {
             Popup.Instance.DisplayMessage("Passowrds do not match!");

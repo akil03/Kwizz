@@ -7,10 +7,13 @@ using UnityEngine.UI;
 public class User : MonoBehaviour
 {
     public InputField userName, pwd, phoneNumber, code;
-    public GameObject loginPage, savePhoneNumberPage, appStartPage, enterCodePage, questionPage;
+    public GameObject loginPage, savePhoneNumberPage, appStartPage, enterCodePage, questionPage, profilePage;
     public QuestionsPage questionsPage;
     public static User instance;
     public bool dontCheckPhoneNumber;
+    public InputField userNameText, phone;
+    public Text amount;
+    public AccountDetails accountDetails;
 
 
     private void Awake()
@@ -46,17 +49,28 @@ public class User : MonoBehaviour
 
     private void AccountDetailsCallback(AccountDetailsResponse obj)
     {
-        AccountDetails details = JsonUtility.FromJson<AccountDetails>(obj.JSONString);
-        if (details.scriptData.result == "add number" && !dontCheckPhoneNumber)
+        if (obj.HasErrors && obj.Errors.JSON.Contains("add number"))
         {
-            loginPage.SetActive(false);
-            savePhoneNumberPage.SetActive(true);
+            if (!dontCheckPhoneNumber)
+            {
+                loginPage.SetActive(false);
+                savePhoneNumberPage.SetActive(true);
+            }
         }
         else
         {
+            accountDetails = JsonUtility.FromJson<AccountDetails>(obj.JSONString);
+            SetProfileUI();
             OpenGame();
         }
         dontCheckPhoneNumber = false;
+    }
+
+    private void SetProfileUI()
+    {
+        userNameText.text = accountDetails.displayName;
+        phone.text = accountDetails.scriptData.result.phone;
+        amount.text = accountDetails.scriptData.result.amount.ToString();
     }
 
     public void OpenGame()
@@ -87,6 +101,26 @@ public class User : MonoBehaviour
         UserData userData = new UserData();
         userData.phone = phoneNumber.text;
         new GameSparkRequests("SaveUserData").Add("phone", number).Request(SavePhoneNumberCallback);
+    }
+
+    public void UpdateUserdata()
+    {
+        new GameSparkRequests("UpdateUserdata").Add("phone", phone.text).Add("amount", int.Parse(amount.text)).Request(UpdateUserDataCallback);
+        new ChangeUserDetailsRequest().SetDisplayName(userNameText.text).Send(response => { });
+    }
+
+    public void CancelUserDataUpdate()
+    {
+        SetProfileUI();
+    }
+
+    private void UpdateUserDataCallback(string str)
+    {
+        profilePage.SetActive(false);
+        appStartPage.SetActive(true);
+        accountDetails.scriptData.result.amount = int.Parse(amount.text);
+        accountDetails.displayName = userNameText.text;
+        accountDetails.scriptData.result.phone = phone.text;
     }
 
     private void SavePhoneNumberCallback(string str)

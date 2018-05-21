@@ -39,6 +39,7 @@ public class GSResult
 public class UserData
 {
     public string phone;
+    public int amount;
 }
 
 [Serializable]
@@ -57,10 +58,11 @@ public class ExternalIds
 {
 
 }
+
 [Serializable]
 public class AccountDetailsScriptData
 {
-    public string result;
+    public UserData result;
 }
 
 [Serializable]

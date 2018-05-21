@@ -108,6 +108,10 @@ public class GameSparksManager : Singleton<GameSparksManager>
             else
             {
                 print(response.Errors.JSON);
+                if (response.Errors.JSON.Contains("TAKEN"))
+                {
+                    Popup.Instance.DisplayMessage("Email ID already registred!");
+                }
             }
         });
     }

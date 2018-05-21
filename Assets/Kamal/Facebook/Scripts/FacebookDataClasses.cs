@@ -30,6 +30,6 @@ public class Summary
 [Serializable]
 public class FacebookFriendsResult
 {
-    public List<object> data;
+    public List<FacebookUserDetailsResult> data;
     public Summary summary;
 }
