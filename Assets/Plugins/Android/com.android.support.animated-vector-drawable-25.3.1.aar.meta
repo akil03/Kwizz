@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 0a2caab6d5dc1b44992a3ecaa1a8a140
+labels:
+- gpsr
 timeCreated: 1526445339
 licenseType: Pro
 PluginImporter:

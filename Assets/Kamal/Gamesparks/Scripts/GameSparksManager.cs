@@ -161,13 +161,13 @@ public class GameSparksManager : Singleton<GameSparksManager>
 
     public void GetLeaderboard(string id)
     {
-        new LeaderboardsEntriesRequest().SetLeaderboards(new System.Collections.Generic.List<string> { "score" }).Send(reposnse =>
+        new LeaderboardsEntriesRequest().SetLeaderboards(new System.Collections.Generic.List<string> { "money" }).Send(reposnse =>
          {
              if (!reposnse.HasErrors)
              {
                  leaderboardEntry = JsonUtility.FromJson<LeaderboardEntry>(reposnse.JSONString);
                  gotPlayerInLeaderoard(leaderboardEntry.score);
-                 new LeaderboardDataRequest().SetLeaderboardShortCode("score").SetEntryCount(10).Send(response =>
+                 new LeaderboardDataRequest().SetLeaderboardShortCode("money").SetEntryCount(10).Send(response =>
                  {
                      if (!response.HasErrors)
                      {
@@ -175,7 +175,7 @@ public class GameSparksManager : Singleton<GameSparksManager>
                          try
                          {
                              var player = leaderboardData.data.First(a => a.userId == id);
-                             leaderboardData.data.Remove(player);
+                             //leaderboardData.data.Remove(player);
                          }
                          catch (System.Exception)
                          {
