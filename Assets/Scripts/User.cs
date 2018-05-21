@@ -49,17 +49,18 @@ public class User : MonoBehaviour
 
     private void AccountDetailsCallback(AccountDetailsResponse obj)
     {
-        if (obj.HasErrors && obj.Errors.JSON.Contains("add number"))
+        accountDetails = JsonUtility.FromJson<AccountDetails>(obj.JSONString);
+        if (string.IsNullOrEmpty(accountDetails.scriptData.result.phone))
         {
             if (!dontCheckPhoneNumber)
             {
                 loginPage.SetActive(false);
                 savePhoneNumberPage.SetActive(true);
+                return;
             }
         }
         else
         {
-            accountDetails = JsonUtility.FromJson<AccountDetails>(obj.JSONString);
             SetProfileUI();
             OpenGame();
         }
@@ -93,13 +94,30 @@ public class User : MonoBehaviour
 
     public void SavePhoneNumber()
     {
+        try
+        {
+            long.Parse(phoneNumber.text);
+            if (phoneNumber.text.Length < 10 || phoneNumber.text.Length > 12)
+            {
+                Popup.Instance.DisplayMessage("Please enter a valid phone number!");
+                return;
+            }
+        }
+        catch
+        {
+            Popup.Instance.DisplayMessage("Please enter a valid phone number!");
+            return;
+        }
         SavePhoneNumber(phoneNumber.text);
     }
 
     public void SavePhoneNumber(string number)
     {
-        UserData userData = new UserData();
-        userData.phone = phoneNumber.text;
+        if (accountDetails.scriptData.result == null)
+        {
+            accountDetails.scriptData.result = new UserData();
+        }
+        accountDetails.scriptData.result.phone = phoneNumber.text;
         new GameSparkRequests("SaveUserData").Add("phone", number).Request(SavePhoneNumberCallback);
     }
 

@@ -243,7 +243,7 @@ PlayerSettings:
   AndroidTargetDevice: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: D:/ElectronicDreaming/Projects/Kwizz/user.keystore
+  AndroidKeystoreName: D:/UnityProjects/Kwizz/user.keystore
   AndroidKeyaliasName: kwizz
   AndroidTVCompatibility: 0
   AndroidIsGame: 0
