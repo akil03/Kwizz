@@ -5,7 +5,7 @@ using UnityEngine;
 public class FacebookManager : MonoBehaviour
 {
     public bool autoLogin, debugLog;
-    public List<string> permissionsQuery = new List<string>() { "publish_actions" };
+    public List<string> permissionsQuery = new List<string>() { "public_profile" };
     public string detailsQuery = "me?fields=id,name", friendsQuery = "me/friends";
 
     public static ParameterlessDelegate InitComplete;
@@ -46,7 +46,7 @@ public class FacebookManager : MonoBehaviour
 
     public void Login()
     {
-        FB.LogInWithPublishPermissions(permissionsQuery, LoginCallback);
+        FB.LogInWithReadPermissions(permissionsQuery, LoginCallback);
     }
 
     private void LoginCallback(ILoginResult result)

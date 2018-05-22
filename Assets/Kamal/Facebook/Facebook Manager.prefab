@@ -51,9 +51,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a8f5145b81e614c87fa2dc84d30aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoLogin: 1
-  debugLog: 1
+  autoLogin: 0
+  debugLog: 0
   permissionsQuery:
-  - publish_actions
+  - public_profile
   detailsQuery: me?fields=id,name
   friendsQuery: me/friends
+  userDetails:
+    id: 
+    name: 

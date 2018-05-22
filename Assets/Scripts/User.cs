@@ -201,5 +201,6 @@ public class User : MonoBehaviour
     {
         loginPage.SetActive(true);
         questionPage.SetActive(false);
+        accountDetails = new AccountDetails();
     }
 }
