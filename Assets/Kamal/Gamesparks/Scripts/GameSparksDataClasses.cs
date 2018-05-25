@@ -101,3 +101,9 @@ public class LeaderboardEntry
     public string requestId;
     public List<Datum> score;
 }
+
+[Serializable]
+public class GameSparksLoginFailed
+{
+    public string DETAILS;
+}

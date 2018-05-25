@@ -20,6 +20,11 @@ public class GameSparkRequests
 
     public void Request(StringDelegate SuccessCallback = null, StringDelegate FailedCallback = null)
     {
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Popup.Instance.DisplayMessage("Check your internet connection.");
+            return;
+        }
         var req = new LogEventRequest();
         foreach (var item in dictionary)
         {

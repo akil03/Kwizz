@@ -1,4 +1,5 @@
-﻿public class GoogleManager : Singleton<GoogleManager>
+﻿
+public class GoogleManager : Singleton<GoogleManager>
 {
     public ParameterlessDelegate loginSuccess;
 
@@ -9,6 +10,12 @@
 
     public void Login()
     {
+        if (UnityEngine.Application.internetReachability == UnityEngine.NetworkReachability.NotReachable)
+        {
+            Popup.Instance.DisplayMessage("Check your internet connection.");
+            return;
+        }
+        Loading.Instance.StartLoading();
         LCGoogleLoginBridge.LoginUser(Callback, false);
     }
 

@@ -46,6 +46,12 @@ public class FacebookManager : MonoBehaviour
 
     public void Login()
     {
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Popup.Instance.DisplayMessage("Check your internet connection.");
+            return;
+        }
+        Loading.Instance.StartLoading();
         FB.LogInWithReadPermissions(permissionsQuery, LoginCallback);
     }
 

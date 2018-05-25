@@ -14,7 +14,7 @@ public class User : MonoBehaviour
     public InputField userNameText, phone;
     public Text amount;
     public AccountDetails accountDetails;
-
+    public string phoneNo;
 
     private void Awake()
     {
@@ -44,25 +44,28 @@ public class User : MonoBehaviour
 
     private void OnGameSparksLogin()
     {
+        userName.text = ""; pwd.text = "";
         new AccountDetailsRequest().Send(AccountDetailsCallback);
+        Loading.Instance.StopLoading();
     }
 
     private void AccountDetailsCallback(AccountDetailsResponse obj)
     {
         accountDetails = JsonUtility.FromJson<AccountDetails>(obj.JSONString);
-        if (string.IsNullOrEmpty(accountDetails.scriptData.result.phone))
+        if (string.IsNullOrEmpty(accountDetails.scriptData.result.phone) && !dontCheckPhoneNumber)
         {
-            if (!dontCheckPhoneNumber)
-            {
-                loginPage.SetActive(false);
-                savePhoneNumberPage.SetActive(true);
-                return;
-            }
+            loginPage.SetActive(false);
+            savePhoneNumberPage.SetActive(true);
+            return;
         }
         else
         {
-            SetProfileUI();
             OpenGame();
+            if (dontCheckPhoneNumber)
+            {
+                SavePhoneNumber();
+            }
+            SetProfileUI();
         }
         dontCheckPhoneNumber = false;
     }
@@ -89,15 +92,22 @@ public class User : MonoBehaviour
 
     public void UserNameLogin()
     {
+        Loading.Instance.StartLoading();
         GameSparksManager.Instance.Login(userName.text, pwd.text);
+    }
+
+    public void SetNo()
+    {
+        phoneNo = phoneNumber.text;
+        phoneNumber.text = "";
     }
 
     public void SavePhoneNumber()
     {
         try
         {
-            long.Parse(phoneNumber.text);
-            if (phoneNumber.text.Length < 10 || phoneNumber.text.Length > 12)
+            long.Parse(phoneNo);
+            if (phoneNo.Length < 10 || phoneNo.Length > 12)
             {
                 Popup.Instance.DisplayMessage("Please enter a valid phone number!");
                 return;
@@ -108,16 +118,14 @@ public class User : MonoBehaviour
             Popup.Instance.DisplayMessage("Please enter a valid phone number!");
             return;
         }
-        SavePhoneNumber(phoneNumber.text);
+        SavePhoneNumber(phoneNo);
+        phoneNo = string.Empty;
+        SetProfileUI();
     }
 
     public void SavePhoneNumber(string number)
     {
-        if (accountDetails.scriptData.result == null)
-        {
-            accountDetails.scriptData.result = new UserData();
-        }
-        accountDetails.scriptData.result.phone = phoneNumber.text;
+        accountDetails.scriptData.result.phone = number;
         new GameSparkRequests("SaveUserData").Add("phone", number).Request(SavePhoneNumberCallback);
     }
 
@@ -202,5 +210,8 @@ public class User : MonoBehaviour
         loginPage.SetActive(true);
         questionPage.SetActive(false);
         accountDetails = new AccountDetails();
+        userNameText.text = "";
+        phoneNumber.text = "";
+        amount.text = "0";
     }
 }

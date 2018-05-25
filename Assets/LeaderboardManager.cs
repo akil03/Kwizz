@@ -11,6 +11,7 @@ public class LeaderboardManager : MonoBehaviour
     {
         GameSparksManager.Instance.gotLeaderboard += GotLeaderboard;
         GameSparksManager.Instance.gotPlayerInLeaderoard += GotPlayerPositionInLeaderboard;
+        GameSparksManager.Instance.loggedOut += Reset;
     }
 
     private void GotPlayerPositionInLeaderboard(List<Datum> list)
@@ -36,5 +37,14 @@ public class LeaderboardManager : MonoBehaviour
             instance.transform.localScale = Vector3.one;
             leaderboardElements.Add(instance);
         }
+    }
+
+    void Reset()
+    {
+        foreach (var item in leaderboardElements)
+        {
+            Destroy(item.gameObject);
+        }
+        leaderboardElements.Clear();
     }
 }

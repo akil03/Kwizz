@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class SignupPage : MonoBehaviour
 {
     public InputField name, phoneNumber, email, password, confirmPassowrd;
+    string number, uname, pwd;
     bool saveNumber;
 
     private void OnEnable()
@@ -17,7 +18,8 @@ public class SignupPage : MonoBehaviour
         if (saveNumber)
         {
             saveNumber = false;
-            User.instance.SavePhoneNumber(phoneNumber.text);
+            User.instance.SavePhoneNumber(number);
+            number = string.Empty;
         }
     }
 
@@ -28,9 +30,6 @@ public class SignupPage : MonoBehaviour
 
     private void OnRegistrationSuccess(string str)
     {
-        saveNumber = true;
-        User.instance.dontCheckPhoneNumber = true;
-        GameSparksManager.Instance.Login(email.text, password.text);
         gameObject.SetActive(false);
     }
 
@@ -60,6 +59,10 @@ public class SignupPage : MonoBehaviour
             Popup.Instance.DisplayMessage("Passowrds do not match!");
             return;
         }
-        GameSparksManager.Instance.Register(name.text, email.text, password.text);
+        number = phoneNumber.text;
+        uname = email.text;
+        pwd = password.text;
+        GameSparksManager.Instance.Register(name.text, email.text, password.text, phoneNumber.text);
+        name.text = ""; phoneNumber.text = ""; email.text = ""; password.text = ""; confirmPassowrd.text = "";
     }
 }

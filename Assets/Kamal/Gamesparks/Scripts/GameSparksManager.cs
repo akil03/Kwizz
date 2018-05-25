@@ -18,7 +18,7 @@ public class GameSparksManager : Singleton<GameSparksManager>
     public LeaderboardEntry leaderboardEntry;
     public LeaderboardDataDelegate gotLeaderboard;
     public LeaderboardDataDelegate gotPlayerInLeaderoard;
-    bool isloggedIn;
+    public bool isloggedIn;
     public GameObject loginPage, loading;
 
     private void Start()
@@ -31,7 +31,6 @@ public class GameSparksManager : Singleton<GameSparksManager>
             if (!isloggedIn)
             {
                 isloggedIn = true;
-                loading.SetActive(false);
                 if (authenticated != null)
                 {
                     authenticated();
@@ -93,16 +92,19 @@ public class GameSparksManager : Singleton<GameSparksManager>
         });
     }
 
-    public void Register(string displayName, string userName, string password)
+    public void Register(string displayName, string userName, string password, string phone)
     {
         new RegistrationRequest().SetDisplayName(displayName).SetUserName(userName).SetPassword(password).Send(response =>
         {
             if (!response.HasErrors)
             {
                 isloggedIn = false;
+                User.instance.dontCheckPhoneNumber = true;
+                User.instance.phoneNo = phone;
+                Login(userName, password);
                 if (RegistrationSuccess != null)
                 {
-                    RegistrationSuccess(response.JSONString);
+                    RegistrationSuccess("");
                 }
             }
             else
@@ -118,6 +120,16 @@ public class GameSparksManager : Singleton<GameSparksManager>
 
     public void Login(string username, string password)
     {
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        {
+            Popup.Instance.DisplayMessage("Email and password cannot be empty.");
+            return;
+        }
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            Popup.Instance.DisplayMessage("Check your internet connection.");
+            return;
+        }
         new AuthenticationRequest().SetUserName(username).SetPassword(password).Send(callback =>
         {
             if (!callback.HasErrors)
@@ -129,7 +141,18 @@ public class GameSparksManager : Singleton<GameSparksManager>
             }
             else
             {
-                print(callback.Errors.JSON);
+                if (callback.Errors.JSON.Contains("UNRECOGNISED"))
+                {
+                    Popup.Instance.DisplayMessage("The login does not exist.");
+                    return;
+                }
+                if (callback.Errors.JSON.Contains("LOCKED"))
+                {
+                    Popup.Instance.DisplayMessage("Account locked. Try again aftre sometime.");
+                    return;
+                }
+                var error = JsonUtility.FromJson<GameSparksLoginFailed>(callback.Errors.JSON);
+                Popup.Instance.DisplayMessage(error.DETAILS);
             }
         });
     }

@@ -14,6 +14,7 @@ public class Popup : Singleton<Popup>
         ok.gameObject.SetActive(false);
         cancel.gameObject.SetActive(false);
         this.message.text = message;
+        Loading.Instance.StopLoading();
     }
 
     public void Close()
