@@ -35,8 +35,8 @@ public class GameSparksManager : Singleton<GameSparksManager>
                 if (authenticated != null)
                 {
                     authenticated();
-                    GetLeaderboard(str);
                 }
+                GetLeaderboard(str);
             }
         };
         IsLoggedin();
