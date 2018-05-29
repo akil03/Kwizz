@@ -4,8 +4,8 @@ using GameSparks.Api.Messages;
 using GameSparks.Api.Requests;
 using GameSparks.Core;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(GameSparksUnity))]
 public class GameSparksManager : Singleton<GameSparksManager>
 {
     public bool debugLog;
@@ -14,6 +14,7 @@ public class GameSparksManager : Singleton<GameSparksManager>
     public StringDelegate RegistrationSuccess;
     public ParameterlessDelegate authenticated;
     public ParameterlessDelegate loggedOut;
+    public ParameterlessDelegate loginFailed;
     public LeaderboardData leaderboardData;
     public LeaderboardEntry leaderboardEntry;
     public LeaderboardDataDelegate gotLeaderboard;
@@ -38,22 +39,34 @@ public class GameSparksManager : Singleton<GameSparksManager>
                 }
             }
         };
-        StartCoroutine(WaitForLogin());
+        IsLoggedin();
     }
 
-    System.Collections.IEnumerator WaitForLogin()
+
+    //IEnumerator CheckLogin()
+    //{
+    //    while(GS.)
+    //}
+
+    void IsLoggedin()
     {
-        int i = 0;
-        while (!GS.Authenticated && i < 3)
+        if (Application.internetReachability == NetworkReachability.NotReachable)
         {
-            yield return new WaitForSeconds(1);
-            i++;
+            Popup.Instance.DisplayMessage("Check your internet connection.", () =>
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            });
+            return;
         }
-        if (!GS.Authenticated)
+        string val = PlayerPrefs.GetString("gamesparks.userid");
+        if (string.IsNullOrEmpty(val))
         {
-            GS.Reset();
-            loginPage.SetActive(true);
-            loading.SetActive(false);
+            if (!GS.Authenticated)
+            {
+                GS.Reset();
+                loginPage.SetActive(true);
+                loading.SetActive(false);
+            }
         }
     }
 
@@ -62,6 +75,14 @@ public class GameSparksManager : Singleton<GameSparksManager>
         print("New score");
     }
 
+
+    public void LoginFailed()
+    {
+        if (loginFailed != null)
+        {
+            loginFailed();
+        }
+    }
 
     void GoogleLogin()
     {

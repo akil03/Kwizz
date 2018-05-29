@@ -34,6 +34,10 @@ public class User : MonoBehaviour
     {
         GameSparksManager.Instance.authenticated += OnGameSparksLogin;
         GameSparksManager.Instance.loggedOut += OnLogout;
+        GameSparksManager.Instance.loginFailed += delegate
+        {
+            loginPage.SetActive(true);
+        };
     }
 
     private void OnDisable()

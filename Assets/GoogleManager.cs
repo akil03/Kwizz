@@ -25,5 +25,10 @@ public class GoogleManager : Singleton<GoogleManager>
         {
             loginSuccess();
         }
+        else
+        {
+            Loading.Instance.StopLoading();
+            GameSparksManager.Instance.LoginFailed();
+        }
     }
 }

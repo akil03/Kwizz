@@ -69,6 +69,8 @@ public class FacebookManager : MonoBehaviour
         else
         {
             print("Login failed!");
+            Loading.Instance.StopLoading();
+            GameSparksManager.Instance.LoginFailed();
         }
     }
 
